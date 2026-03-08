@@ -1,27 +1,27 @@
 blueprint:
-  name: TS130F_zigbee_cover_fix
-  description: Fix roller shutter states according to their current position (TS130)
+  name: cover_position_FIX_TS130F (Multi-Device)
+  description: Fix roller shutter states according to their current position for multiple covers
   domain: automation
   input:
-    cover_entity:
-      name: "🏠 Cover"
-      description: Which blind or roller shutter should be fixed
+    cover_entities:
+      name: "🏠 Covers"
+      description: Which blinds or roller shutters should be fixed (select multiple)
       selector:
         entity:
           multiple: true
           filter:
-            - domain:
-                - cover
-
-trigger_variables:
-  the_cover: !input cover_entity
+            - domain: cover
 
 triggers:
-  - trigger: template
-    value_template: "{{ state_attr(the_cover, 'current_position') == 0 }}"
+  - trigger: numeric_state
+    entity_id: !input cover_entities
+    attribute: current_position
+    below: 1
     id: COVER_CLOSED
-  - trigger: template
-    value_template: "{{ state_attr(the_cover, 'current_position') == 100 }}"
+  - trigger: numeric_state
+    entity_id: !input cover_entities
+    attribute: current_position
+    above: 99
     id: COVER_OPENED
 
 conditions: []
@@ -30,20 +30,18 @@ actions:
   - choose:
       - conditions:
           - condition: trigger
-            id:
-              - COVER_CLOSED
+            id: COVER_CLOSED
         sequence:
           - action: cover.close_cover
             target:
-              entity_id: !input cover_entity
+              entity_id: "{{ trigger.entity_id }}"
       - conditions:
           - condition: trigger
-            id:
-              - COVER_OPENED
+            id: COVER_OPENED
         sequence:
           - action: cover.open_cover
             target:
-              entity_id: !input cover_entity
+              entity_id: "{{ trigger.entity_id }}"
 
 mode: parallel
 max: 16
