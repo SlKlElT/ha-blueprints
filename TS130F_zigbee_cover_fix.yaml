@@ -32,14 +32,14 @@ actions:
           - condition: trigger
             id: COVER_CLOSED
         sequence:
-          - action: cover.close_cover
+          - action: cover.stop_cover
             target:
               entity_id: "{{ trigger.entity_id }}"
       - conditions:
           - condition: trigger
             id: COVER_OPENED
         sequence:
-          - action: cover.open_cover
+          - action: cover.stop_cover
             target:
               entity_id: "{{ trigger.entity_id }}"
 
